@@ -1,39 +1,45 @@
 
 
+
+
+// This function counts the number of skill badges earned by users from a given URL and updates a Google Spreadsheet accordingly
 function pointsCount() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const demoSheet = ss.getSheetByName("Demosheet");
-  const demoSheetValues = demoSheet.getDataRange().getValues();
-  const badgeSheet = ss.getSheetByName("Badgesheet");
-  const badgeSheetValues = badgeSheet.getDataRange().getValues();
-  var validDate = new Date('January 1, 2024');
+  const demoSheet = ss.getSheetByName("Demosheet"); // Get the "Demosheet" from the spreadsheet
+  const demoSheetValues = demoSheet.getDataRange().getValues(); // Get all the values from the "Demosheet"
+  const badgeSheet = ss.getSheetByName("Badgesheet"); // Get the "Badgesheet" from the spreadsheet
+  const badgeSheetValues = badgeSheet.getDataRange().getValues(); // Get all the values from the "Badgesheet"
+  var validDate = new Date('January 1, 2024'); // Set a valid date for badge earning
 
 
+// Loop through each row in the "Demosheet"
   for ( let i=1 ; i < demoSheetValues.length; i++){
     var row = demoSheetValues[i];
-    var url = row[5];
+    var url = row[5]; // Get the URL from the current row
     var badgesArray=[];
     let count = 0;
     var skillBagesArray=[];
     var trimmedDateString;
 
   if(url){
-  var response = UrlFetchApp.fetch(url);
+  var response = UrlFetchApp.fetch(url); // Fetch the URL content
   var htmlResponse = response.getContentText()
 
   const $ = Cheerio.load(htmlResponse)
   
-
+// Extract skill badges earned by the user from the URL content
   const bagesEarn = $('span.ql-title-medium.l-mts').map(function(){
     return $(this).text().trim();
   }).get();
   
+// Populate an array with badge values from the "Badgesheet"
+
   for (let i=1 ;i<badgeSheetValues.length ; i++){
     var row = badgeSheetValues[i];
     badgesArray.push(row);
   }
 
-    // Extract only the date part from the text content
+// Extract earned dates of badges
   var earnDates = $('span.ql-body-medium.l-mbs').map(function(){
       var text = $(this).text().trim();
       // Extract the date part by splitting the string and taking the second part
@@ -47,6 +53,8 @@ function pointsCount() {
   })
 
 
+
+// Loop through each badge in the "Badgesheet" and compare with earned badges
 for (let i = 0; i < badgeSheetValues.length; i++) {
     for (let j = 0; j < bagesEarn.length; j++) {
         // Check if badge values match and the date is valid
@@ -58,12 +66,17 @@ for (let i = 0; i < badgeSheetValues.length; i++) {
     }
 }
 
+
 console.log(skillBagesArray);
 console.log(count);
 
-const badgesString = skillBagesArray.join(', ');
-demoSheet.getRange(i+1,9,1,1).setValue(badgesString);
-demoSheet.getRange(i+1,10,1,1).setValue(count);
+
+
+ const badgesString = skillBagesArray.join(', ');// Concatenate skill badges into a string
+ // Update the "Demosheet" with concatenated badges string and count
+
+ demoSheet.getRange(i+1,9,1,1).setValue(badgesString);
+ demoSheet.getRange(i+1,10,1,1).setValue(count);
 
 
 }
@@ -71,7 +84,7 @@ demoSheet.getRange(i+1,10,1,1).setValue(count);
 }
 
 
-// Fetching skill badges from qwiklabs catalog 
+// This function fetches user information and skill badges from a URL and updates the Google Spreadsheet with the information
 
 function test() {
   var ss = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1idV_nY79eg4dyojYQDScd2xwd3ZXsqaZfk0hDG0TDFg/edit#gid=1878330627");
@@ -118,6 +131,7 @@ function myFunction() {
   const badgeSheetValues = badgeSheet.getDataRange().getValues();
 
 
+
   for ( let i=1 ; i < demoSheetValues.length; i++){
     var row = demoSheetValues[i];
     var url = row[5];
@@ -136,18 +150,15 @@ function myFunction() {
 
 
         // Concatenate the badge names into a single string
-      const badgesString = bagesEarn.join(', '); 
+      const badgesString = bagesEarn.join(', '); // You can use any delimiter you want
 
       // Set the concatenated string into the cell
       demoSheet.getRange(i + 1,8,1,1).setValue(badgesString);
        console.log(badgesString)
 
-
-
   }
 }
 }
-
 
 
 
